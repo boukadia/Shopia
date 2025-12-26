@@ -30,11 +30,13 @@ model User {
 
 model Produit{
   id Int @id @default(autoincrement())
-  name String
+  nom String
   description String
   prix Int
   isActive  Boolean @default(true)
   createdAt DateTime @default(now())
+  categoryId Int
+   category Category @relation(fields:[categoryId],references:[id])
   commandes ComProd[]
 }
 
@@ -48,7 +50,8 @@ model Commande{
 
 model Category{
   id Int @default(autoincrement()) @id
-  name String
+  nom String
+  produit Produit[]
   createdAt DateTime @default(now())
 }
 
