@@ -47,5 +47,10 @@ export class ProduitsController {
   updateStock(@Param('id') id: number, @Param('quantity') quantity: number) {
     return this.produitsService.updateStock(+id, +quantity);
   }
+  @Put('status/:id/')
+  updateStatus(@Param('id') id: number){
+    return this.produitsService.toggleStatus(+id);
+  }
+
 }
 

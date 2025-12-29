@@ -26,7 +26,9 @@ export class ProduitsService {
     if (!produitExist) {
       throw new NotFoundException('Produit not found');
     }
-    return `This action returns a #${id} produit`;
+    const produit = await this.prisma.produit.findUnique({where:{id:id}});
+    
+    return produit;
   }
 
  async update(id: number, updateProduitDto: UpdateProduitDto) : Promise<Produit| null > {
@@ -52,8 +54,9 @@ export class ProduitsService {
     if (!produitExist) {
       throw new NotFoundException('Produit not found');
     }
-    const produit = await this.prisma.produit.delete({
-      where: { id: id }
+    const produit = await this.prisma.produit.update({
+      where: { id: id },
+      data: { isActive: false },
     });
     return produit;
   }
@@ -96,10 +99,29 @@ export class ProduitsService {
     }
 
     const quantityInStock = produitExist.stock;
-    const updatedProduit = await this.prisma.produit.update({s
+    const updatedProduit = await this.prisma.produit.update({
       where:{id:id},
       data: { stock:   Number(quantityInStock) - Number(quantity) },
     });
     return updatedProduit;
+  }
+  async toggleStatus(id:number):Promise<Produit>{
+    const produit=await this.prisma.produit.findUnique({where:{id:id}});
+    if(!produit){
+      throw new NotFoundException('Produit not found');
+    }
+    if(produit.isActive){
+      const updatedProduit=await this.prisma.produit.update({
+        where:{id:id},
+        data:{isActive:false}
+      });
+    } else{
+      const updatedProduit=await this.prisma.produit.update({
+        where:{id:id},
+        data:{isActive:true}
+      });
+    }
+
+    return produit;
   }
 }
