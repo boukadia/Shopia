@@ -43,5 +43,9 @@ export class ProduitsController {
   findByPriceRange(@Param('min') min: number, @Param('max') max: number) {
     return this.produitsService.findByPriceRange(+min, +max);
   }
-
+  @Put('update-stock/:id/:quantity')
+  updateStock(@Param('id') id: number, @Param('quantity') quantity: number) {
+    return this.produitsService.updateStock(+id, +quantity);
+  }
 }
+

@@ -9,6 +9,9 @@ export class CreateProduitDto {
     @IsNumber()
     prix: number;
     @IsNumber()
+    @IsOptional()
+    stock: number;
+    @IsNumber()
     categoryId: number;
 
 }

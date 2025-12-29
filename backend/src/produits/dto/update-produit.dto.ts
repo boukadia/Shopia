@@ -12,4 +12,7 @@ export class UpdateProduitDto  {
     @IsNumber()
     @IsOptional()
     prix: number;
+    @IsNumber()
+    @IsOptional()
+    stock: number;
 }

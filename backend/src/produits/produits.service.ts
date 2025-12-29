@@ -87,4 +87,19 @@ export class ProduitsService {
     });
     return produits;
   }
+  async updateStock(id: number, quantity: number): Promise<Produit> {
+    const produitExist = await this.prisma.produit.findUnique({
+      where: { id: id }
+    });
+    if (!produitExist) {
+      throw new NotFoundException('Produit not found');
+    }
+
+    const quantityInStock = produitExist.stock;
+    const updatedProduit = await this.prisma.produit.update({s
+      where:{id:id},
+      data: { stock:   Number(quantityInStock) - Number(quantity) },
+    });
+    return updatedProduit;
+  }
 }
