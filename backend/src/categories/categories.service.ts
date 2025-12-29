@@ -48,4 +48,6 @@ export class CategoriesService {
     const category=await this.prisma.category.delete({where:{id:id}})
     return category;
   }
+  
+  
 }

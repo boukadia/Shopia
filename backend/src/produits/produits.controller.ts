@@ -31,4 +31,17 @@ export class ProduitsController {
   remove(@Param('id') id: number) {
     return this.produitsService.remove(+id);
   }
+  @Get('by-name/:name')
+  findByName(@Param('name') name: string) {
+    return this.produitsService.searchByName(name);
+  }
+  @Get('by-category/:categoryId')
+  findByCategory(@Param('categoryId') categoryId: number) {
+    return this.produitsService.findByCategoryId(+categoryId);
+  }
+  @Get('by-price-range/:min/:max')
+  findByPriceRange(@Param('min') min: number, @Param('max') max: number) {
+    return this.produitsService.findByPriceRange(+min, +max);
+  }
+
 }

@@ -57,4 +57,34 @@ export class ProduitsService {
     });
     return produit;
   }
+
+  async findByCategoryId(categoryId: number): Promise<Produit[]> {
+    const produits = await this.prisma.produit.findMany({
+      where: { categoryId: categoryId },
+    });
+    return produits;
+  }
+  async findByPriceRange(minPrice: number, maxPrice: number): Promise<Produit[]> {
+    const produits = await this.prisma.produit.findMany({
+      where: {
+        prix: {
+          gte: minPrice,
+          lte: maxPrice,
+        },
+      },
+    });
+    return produits;
+  }
+
+  async searchByName(nom: string): Promise<Produit[]> {
+    const produits = await this.prisma.produit.findMany({
+      where: {
+        nom: {
+          contains: nom,
+          mode: 'insensitive',
+        },
+      },
+    });
+    return produits;
+  }
 }
