@@ -16,6 +16,10 @@ export class ProduitsController {
   findAll() {
     return this.produitsService.findAll();
   }
+  @Get('/active')
+  findAllActive() {
+    return this.produitsService.findAllActive();
+  }
 
   @Get(':id')
   findOne(@Param('id') id: number) {
