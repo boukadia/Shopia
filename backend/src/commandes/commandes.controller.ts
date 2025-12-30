@@ -1,20 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { CommandesService } from './commandes.service';
 import { CreateCommandeDto } from './dto/create-commande.dto';
 import { UpdateCommandeDto } from './dto/update-commande.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Controller('commandes')
+@UseGuards(JwtAuthGuard)
 export class CommandesController {
   constructor(private readonly commandesService: CommandesService) {}
 
   @Post()
-  create(@Body() createCommandeDto: CreateCommandeDto) {
-    return this.commandesService.create(createCommandeDto);
+  create(@Body() createCommandeDto: CreateCommandeDto, @CurrentUser() user: any) {
+    return this.commandesService.create(createCommandeDto, user.userId);
   }
 
   @Get()
-  findAll() {
-    return this.commandesService.findAll();
+  findAll(@CurrentUser() user: any) {
+    return this.commandesService.findAll(user.userId);
   }
 
   @Get(':id')

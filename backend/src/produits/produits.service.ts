@@ -15,25 +15,34 @@ export class ProduitsService {
   }
 
   async findAll(): Promise<Produit[]> {
-    const produits =await this.prisma.produit.findMany();
+    const produits = await this.prisma.produit.findMany();
+    return produits;
+  }
+  async findAllActive(): Promise<Produit[]> {
+    const produits = await this.prisma.produit.findMany({
+      where: { isActive: true },
+    });
     return produits;
   }
 
   async findOne(id: number) {
     const produitExist = await this.prisma.produit.findUnique({
-      where: { id: id }
+      where: { id: id },
     });
     if (!produitExist) {
       throw new NotFoundException('Produit not found');
     }
-    const produit = await this.prisma.produit.findUnique({where:{id:id}});
-    
+    const produit = await this.prisma.produit.findUnique({ where: { id: id } });
+
     return produit;
   }
 
- async update(id: number, updateProduitDto: UpdateProduitDto) : Promise<Produit| null > {
-    const produitExist = await this.prisma.produit.findUnique({ 
-      where: { id :id}
+  async update(
+    id: number,
+    updateProduitDto: UpdateProduitDto,
+  ): Promise<Produit | null> {
+    const produitExist = await this.prisma.produit.findUnique({
+      where: { id: id },
     });
 
     if (!produitExist) {
@@ -42,14 +51,14 @@ export class ProduitsService {
 
     const produit = await this.prisma.produit.update({
       where: { id: id },
-      data:updateProduitDto
+      data: updateProduitDto,
     });
     return produit;
   }
 
-  async remove(id: number) : Promise<Produit | null > {
+  async remove(id: number): Promise<Produit | null> {
     const produitExist = await this.prisma.produit.findUnique({
-      where: { id }
+      where: { id },
     });
     if (!produitExist) {
       throw new NotFoundException('Produit not found');
@@ -67,7 +76,10 @@ export class ProduitsService {
     });
     return produits;
   }
-  async findByPriceRange(minPrice: number, maxPrice: number): Promise<Produit[]> {
+  async findByPriceRange(
+    minPrice: number,
+    maxPrice: number,
+  ): Promise<Produit[]> {
     const produits = await this.prisma.produit.findMany({
       where: {
         prix: {
@@ -92,7 +104,7 @@ export class ProduitsService {
   }
   async updateStock(id: number, quantity: number): Promise<Produit> {
     const produitExist = await this.prisma.produit.findUnique({
-      where: { id: id }
+      where: { id: id },
     });
     if (!produitExist) {
       throw new NotFoundException('Produit not found');
@@ -100,25 +112,25 @@ export class ProduitsService {
 
     const quantityInStock = produitExist.stock;
     const updatedProduit = await this.prisma.produit.update({
-      where:{id:id},
-      data: { stock:   Number(quantityInStock) - Number(quantity) },
+      where: { id: id },
+      data: { stock: Number(quantityInStock) - Number(quantity) },
     });
     return updatedProduit;
   }
-  async toggleStatus(id:number):Promise<Produit>{
-    const produit=await this.prisma.produit.findUnique({where:{id:id}});
-    if(!produit){
+  async toggleStatus(id: number): Promise<Produit> {
+    const produit = await this.prisma.produit.findUnique({ where: { id: id } });
+    if (!produit) {
       throw new NotFoundException('Produit not found');
     }
-    if(produit.isActive){
-      const updatedProduit=await this.prisma.produit.update({
-        where:{id:id},
-        data:{isActive:false}
+    if (produit.isActive) {
+      const updatedProduit = await this.prisma.produit.update({
+        where: { id: id },
+        data: { isActive: false },
       });
-    } else{
-      const updatedProduit=await this.prisma.produit.update({
-        where:{id:id},
-        data:{isActive:true}
+    } else {
+      const updatedProduit = await this.prisma.produit.update({
+        where: { id: id },
+        data: { isActive: true },
       });
     }
 
