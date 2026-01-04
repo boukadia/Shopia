@@ -1,84 +1,83 @@
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url=env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
-enum Role{
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  name      String
+  password  String
+  role      Role       @default(CLIENT)
+  createdAt DateTime   @default(now())
+  commande  Commande[]
+}
+
+model Produit {
+  id          Int        @id @default(autoincrement())
+  nom         String
+  description String
+  prix        Int
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  inventory   Inventory?
+  categoryId  Int
+  category    Category   @relation(fields: [categoryId], references: [id])
+  commandes   ComProd[]
+}
+
+model Commande {
+  id         Int            @id @default(autoincrement())
+  status     CommandeStatus @default(PENDING)
+  totalPrice Int
+  createdAt  DateTime       @default(now())
+  produits   ComProd[]
+  userId     Int
+  user       User           @relation(fields: [userId], references: [id])
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  nom       String
+  produit   Produit[]
+  createdAt DateTime  @default(now())
+}
+
+model Inventory {
+  id        Int      @id @default(autoincrement())
+  productId Int      @unique
+  sku       String   @unique
+  quantity  Int
+  reserved  Int
+  product   Produit  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model ComProd {
+  id         Int      @id @default(autoincrement())
+  commandeId Int
+  produitId  Int
+  /// l quantity dyal hadak lproduct
+  quantity   Int
+  /// l prix khaso iji mn l panel mli ihsb quantity*prix(dyal kol product)
+  price      Int
+  commande   Commande @relation(fields: [commandeId], references: [id])
+  produit    Produit  @relation(fields: [produitId], references: [id])
+}
+
+enum Role {
   ADMIN
   CLIENT
 }
 
-enum CommandeStatus{
-  PENDING 
-  PROCESSING 
-  SHIPPED 
-  DELIVERED 
-  CANCELLED 
+enum CommandeStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
-model User {
-  id Int @id @default(autoincrement())
-  email String @unique
-  name String 
-  password String
-  role Role @default(CLIENT)
-  commande Commande[]
-  createdAt DateTime @default(now())
-}
-
-model Produit{
-  id Int @id @default(autoincrement())
-  nom String
-  description String
-  prix Int
-  stock Int @default(0)
-  isActive  Boolean @default(true)
-  createdAt DateTime @default(now())
-  categoryId Int
-   category Category @relation(fields:[categoryId],references:[id])
-  commandes ComProd[]
-}
-
-model Commande{
-  id Int @default(autoincrement()) @id
-  status CommandeStatus @default(PENDING)
-  totalPrice Int
-  createdAt DateTime @default(now())
-  produits ComProd[]
-  userId Int
-  user User @relation(fields:[userId],references:[id])
-
-}
-
-model Category{
-  id Int @default(autoincrement()) @id
-  nom String
-  produit Produit[]
-  createdAt DateTime @default(now())
-}
-
-model Inventory{
-  id Int @default(autoincrement()) @id
-  sku CommandeStatus @default(PENDING)
-  quantity Int
-  reserved Int
-  createdAt DateTime @default(now())
-}
-
-model ComProd{
-  id Int @default(autoincrement()) @id
-  commandeId Int
-  commande Commande @relation(fields:[commandeId],references:[id])
-  produitId Int
-  produit Produit @relation(fields:[produitId],references:[id]) 
-  /// l quantity dyal hadak lproduct
-  quantity Int
-  ///l prix khaso iji mn l panel mli ihsb quantity*prix(dyal kol product)
-  price Int 
-}
-
-
-

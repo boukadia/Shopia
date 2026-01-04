@@ -102,38 +102,17 @@ export class ProduitsService {
     });
     return produits;
   }
-  async updateStock(id: number, quantity: number): Promise<Produit> {
-    const produitExist = await this.prisma.produit.findUnique({
-      where: { id: id },
-    });
-    if (!produitExist) {
-      throw new NotFoundException('Produit not found');
-    }
-
-    const quantityInStock = produitExist.stock;
-    const updatedProduit = await this.prisma.produit.update({
-      where: { id: id },
-      data: { stock: Number(quantityInStock) - Number(quantity) },
-    });
-    return updatedProduit;
-  }
   async toggleStatus(id: number): Promise<Produit> {
     const produit = await this.prisma.produit.findUnique({ where: { id: id } });
     if (!produit) {
       throw new NotFoundException('Produit not found');
     }
-    if (produit.isActive) {
-      const updatedProduit = await this.prisma.produit.update({
-        where: { id: id },
-        data: { isActive: false },
-      });
-    } else {
-      const updatedProduit = await this.prisma.produit.update({
-        where: { id: id },
-        data: { isActive: true },
-      });
-    }
+    
+    const updatedProduit = await this.prisma.produit.update({
+      where: { id: id },
+      data: { isActive: !produit.isActive },
+    });
 
-    return produit;
+    return updatedProduit;
   }
 }
