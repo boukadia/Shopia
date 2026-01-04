@@ -1,5 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateProduitDto } from './create-produit.dto';
+
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateProduitDto {

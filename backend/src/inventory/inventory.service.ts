@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Inventory } from '@prisma/client';
@@ -35,13 +39,18 @@ export class InventoryService {
     });
 
     if (!inventory) {
-      throw new NotFoundException(`Inventory for product #${productId} not found`);
+      throw new NotFoundException(
+        `Inventory for product #${productId} not found`,
+      );
     }
 
     return inventory;
   }
 
-  async update(id: number, updateInventoryDto: UpdateInventoryDto): Promise<Inventory> {
+  async update(
+    id: number,
+    updateInventoryDto: UpdateInventoryDto,
+  ): Promise<Inventory> {
     const inventory = await this.prisma.inventory.findUnique({
       where: { id },
     });
@@ -57,7 +66,9 @@ export class InventoryService {
       });
 
       if (existingSku) {
-        throw new BadRequestException(`SKU ${updateInventoryDto.sku} already exists`);
+        throw new BadRequestException(
+          `SKU ${updateInventoryDto.sku} already exists`,
+        );
       }
     }
 
@@ -70,13 +81,18 @@ export class InventoryService {
     return updatedInventory;
   }
 
-  async updateByProductId(productId: number, quantity: number): Promise<Inventory> {
+  async updateByProductId(
+    productId: number,
+    quantity: number,
+  ): Promise<Inventory> {
     const inventory = await this.prisma.inventory.findUnique({
       where: { productId },
     });
 
     if (!inventory) {
-      throw new NotFoundException(`Inventory for product #${productId} not found`);
+      throw new NotFoundException(
+        `Inventory for product #${productId} not found`,
+      );
     }
 
     if (quantity < 0) {
@@ -91,8 +107,6 @@ export class InventoryService {
 
     return updatedInventory;
   }
-
-  
 
   async getLowStock(threshold: number = 10): Promise<Inventory[]> {
     const lowStockItems = await this.prisma.inventory.findMany({

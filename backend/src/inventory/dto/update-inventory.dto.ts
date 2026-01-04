@@ -7,7 +7,7 @@ export class UpdateInventoryDto extends PartialType(CreateInventoryDto) {
   @ApiPropertyOptional({
     description: 'SKU code',
     example: 'LAP-HP-002',
-    type: String
+    type: String,
   })
   @IsString()
   @IsOptional()
@@ -16,7 +16,7 @@ export class UpdateInventoryDto extends PartialType(CreateInventoryDto) {
   @ApiPropertyOptional({
     description: 'Available quantity',
     example: 45,
-    type: Number
+    type: Number,
   })
   @IsNumber()
   @Min(0)
@@ -26,7 +26,7 @@ export class UpdateInventoryDto extends PartialType(CreateInventoryDto) {
   @ApiPropertyOptional({
     description: 'Reserved quantity',
     example: 5,
-    type: Number
+    type: Number,
   })
   @IsNumber()
   @Min(0)
