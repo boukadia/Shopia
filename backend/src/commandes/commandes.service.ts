@@ -32,7 +32,7 @@ export class CommandesService {
     return commande;
   }
 
-  async findAll(userId: number) {
+  async findAllMy(userId: number) {
     const commandes = await this.prisma.commande.findMany({
       where: { userId: userId },
       include: {
@@ -45,6 +45,19 @@ export class CommandesService {
     });
     return commandes;
   }
+  async findAll() {
+    const commandes = await this.prisma.commande.findMany({
+      include: {
+        produits: {
+          include: {
+            produit: true,
+          },
+        },
+      },
+    });
+    return commandes;
+  }
+   
 
   findOne(id: number) {
     const commande = this.prisma.commande.findUnique({
@@ -102,7 +115,11 @@ export class CommandesService {
           throw new NotFoundException(`Produit #${prod.produitId} not found`);
         }
 
-        if (produit.stock < prod.quantity) {
+        const inventory = await this.prisma.inventory.findUnique({
+          where: { productId: prod.produitId },
+        });
+
+        if (!inventory || inventory.quantity < prod.quantity) {
           throw new NotFoundException(
             `Stock insuffisant pour produit #${prod.produitId}`,
           );
@@ -117,9 +134,9 @@ export class CommandesService {
           },
         });
 
-        await this.prisma.produit.update({
-          where: { id: prod.produitId },
-          data: { stock: { decrement: prod.quantity } },
+        await this.prisma.inventory.update({
+          where: { productId: prod.produitId },
+          data: { quantity: { decrement: prod.quantity } },
         });
       }
     }
@@ -148,19 +165,24 @@ export class CommandesService {
         const difference = newQuantity - oldQuantity;
 
         if (difference > 0) {
-          if (existingComProd.produit.stock < difference) {
+          const inventory = await this.prisma.inventory.findUnique({
+            where: { productId: prod.produitId },
+          });
+          
+          if (!inventory || inventory.quantity < difference) {
             throw new NotFoundException(
               `Stock insuffisant pour produit #${prod.produitId}`,
             );
           }
-          await this.prisma.produit.update({
-            where: { id: prod.produitId },
-            data: { stock: { decrement: difference } },
+          
+          await this.prisma.inventory.update({
+            where: { productId: prod.produitId },
+            data: { quantity: { decrement: difference } },
           });
         } else if (difference < 0) {
-          await this.prisma.produit.update({
-            where: { id: prod.produitId },
-            data: { stock: { increment: Math.abs(difference) } },
+          await this.prisma.inventory.update({
+            where: { productId: prod.produitId },
+            data: { quantity: { increment: Math.abs(difference) } },
           });
         }
 
@@ -188,9 +210,9 @@ export class CommandesService {
         });
 
         if (comProd) {
-          await this.prisma.produit.update({
-            where: { id: produitId },
-            data: { stock: { increment: comProd.quantity } },
+          await this.prisma.inventory.update({
+            where: { productId: produitId },
+            data: { quantity: { increment: comProd.quantity } },
           });
 
           await this.prisma.comProd.delete({
@@ -239,9 +261,9 @@ export class CommandesService {
     }
 
     for (const comProd of commande.produits) {
-      await this.prisma.produit.update({
-        where: { id: comProd.produitId },
-        data: { stock: { increment: comProd.quantity } },
+      await this.prisma.inventory.update({
+        where: { productId: comProd.produitId },
+        data: { quantity: { increment: comProd.quantity } },
       });
     }
 
