@@ -5,7 +5,7 @@ export class CreateInventoryDto {
   @ApiProperty({
     description: 'Product ID',
     example: 1,
-    type: Number
+    type: Number,
   })
   @IsNumber()
   @IsPositive()
@@ -14,7 +14,7 @@ export class CreateInventoryDto {
   @ApiProperty({
     description: 'SKU code',
     example: 'LAP-HP-001',
-    type: String
+    type: String,
   })
   @IsString()
   sku: string;
@@ -22,7 +22,7 @@ export class CreateInventoryDto {
   @ApiProperty({
     description: 'Available quantity',
     example: 50,
-    type: Number
+    type: Number,
   })
   @IsNumber()
   @Min(0)
@@ -32,7 +32,7 @@ export class CreateInventoryDto {
     description: 'Reserved quantity',
     example: 0,
     type: Number,
-    default: 0
+    default: 0,
   })
   @IsNumber()
   @Min(0)

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateProduitDto } from './dto/create-produit.dto';
 import { UpdateProduitDto } from './dto/update-produit.dto';
 import { Produit } from '@prisma/client';
@@ -133,7 +137,7 @@ export class ProduitsService {
     if (!produit) {
       throw new NotFoundException('Produit not found');
     }
-    
+
     const updatedProduit = await this.prisma.produit.update({
       where: { id: id },
       data: { isActive: !produit.isActive },
