@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateProduitDto } from './dto/create-produit.dto';
 import { UpdateProduitDto } from './dto/update-produit.dto';
 import { Produit } from '@prisma/client';
@@ -8,9 +8,35 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ProduitsService {
   constructor(private prisma: PrismaService) {}
   async create(data: CreateProduitDto): Promise<Produit> {
-    const produit = await this.prisma.produit.create({
-      data: data,
+    // Check if SKU already exists
+    const existingSku = await this.prisma.inventory.findUnique({
+      where: { sku: data.sku },
     });
+
+    if (existingSku) {
+      throw new BadRequestException('SKU already exists');
+    }
+
+    // Create product
+    const produit = await this.prisma.produit.create({
+      data: {
+        nom: data.nom,
+        description: data.description,
+        prix: data.prix,
+        categoryId: data.categoryId,
+      },
+    });
+
+    // Create inventory for the product
+    await this.prisma.inventory.create({
+      data: {
+        productId: produit.id,
+        sku: data.sku,
+        quantity: data.quantity ?? 0,
+        reserved: data.reserved ?? 0,
+      },
+    });
+
     return produit;
   }
 
