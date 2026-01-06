@@ -1,12 +1,21 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateCommandeDto } from './dto/create-commande.dto';
 import { UpdateCommandeDto } from './dto/update-commande.dto';
 import { Commande } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+import Stripe from 'stripe';
+import { log } from 'console';
+const iStripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
 @Injectable()
 export class CommandesService {
   constructor(private prisma: PrismaService) {}
+
   async create(data: CreateCommandeDto, userId: number): Promise<Commande> {
     const { produits, ...commandeData } = data;
     const commande = await this.prisma.commande.create({
@@ -57,10 +66,9 @@ export class CommandesService {
     });
     return commandes;
   }
-   
 
-  findOne(id: number) {
-    const commande = this.prisma.commande.findUnique({
+  async findOne(id: number) {
+    const commande = await this.prisma.commande.findUnique({
       where: {
         id: id,
       },
@@ -165,13 +173,13 @@ export class CommandesService {
           const inventory = await this.prisma.inventory.findUnique({
             where: { productId: prod.produitId },
           });
-          
+
           if (!inventory || inventory.quantity < difference) {
             throw new BadRequestException(
               `Stock insuffisant pour produit #${prod.produitId}`,
             );
           }
-          
+
           await this.prisma.inventory.update({
             where: { productId: prod.produitId },
             data: { quantity: { decrement: difference } },
@@ -225,7 +233,6 @@ export class CommandesService {
 
     const newTotalPrice = allComProds.reduce((sum, cp) => sum + cp.price, 0);
 
-    
     const updatedCommande = await this.prisma.commande.update({
       where: { id },
       data: { totalPrice: newTotalPrice },
@@ -252,7 +259,7 @@ export class CommandesService {
         },
       },
     });
-    
+
     if (!commande) {
       throw new NotFoundException(`Commande #${id} not found`);
     }
@@ -296,4 +303,6 @@ export class CommandesService {
     });
     return updatedCommande;
   }
+
+  // ==================================stripe==================
 }

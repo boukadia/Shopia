@@ -71,6 +71,8 @@ export class CommandesController {
     return this.commandesService.findAll();
   }
 
+  
+
   @Get(':id')
   @ApiOperation({
     summary: 'Get order by ID',
