@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateCommandeDto } from './dto/create-commande.dto';
 import { UpdateCommandeDto } from './dto/update-commande.dto';
 import { Commande } from '@prisma/client';
@@ -109,18 +109,15 @@ export class CommandesService {
       for (const prod of updateCommandeDto.addProduits) {
         const produit = await this.prisma.produit.findUnique({
           where: { id: prod.produitId },
+          include: { inventory: true },
         });
 
         if (!produit) {
           throw new NotFoundException(`Produit #${prod.produitId} not found`);
         }
 
-        const inventory = await this.prisma.inventory.findUnique({
-          where: { productId: prod.produitId },
-        });
-
-        if (!inventory || inventory.quantity < prod.quantity) {
-          throw new NotFoundException(
+        if (!produit.inventory || produit.inventory.quantity < prod.quantity) {
+          throw new BadRequestException(
             `Stock insuffisant pour produit #${prod.produitId}`,
           );
         }
@@ -170,7 +167,7 @@ export class CommandesService {
           });
           
           if (!inventory || inventory.quantity < difference) {
-            throw new NotFoundException(
+            throw new BadRequestException(
               `Stock insuffisant pour produit #${prod.produitId}`,
             );
           }

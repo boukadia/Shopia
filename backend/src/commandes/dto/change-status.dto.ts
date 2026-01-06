@@ -1,14 +1,14 @@
 import { IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { OrderStatus } from '../../common/constants/order-status.enum';
+import { CommandeStatus } from '@prisma/client';
 
 export class ChangeStatusDto {
   @ApiProperty({
     description: 'Order status',
-    enum: OrderStatus,
-    example: OrderStatus.PROCESSING,
-    enumName: 'OrderStatus'
+    enum: CommandeStatus,
+    example: 'PROCESSING',
+    enumName: 'CommandeStatus'
   })
-  @IsEnum(OrderStatus)
-  status: OrderStatus;
+  @IsEnum(CommandeStatus)
+  status: CommandeStatus;
 }

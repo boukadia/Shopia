@@ -1,5 +1,6 @@
-export enum OrderStatus {
+export enum CommandeStatus {
   PENDING = 'PENDING',
+  PAIED = 'PAIED',
   PROCESSING = 'PROCESSING',
   SHIPPED = 'SHIPPED',
   DELIVERED = 'DELIVERED',

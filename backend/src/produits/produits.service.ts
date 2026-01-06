@@ -12,6 +12,15 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ProduitsService {
   constructor(private prisma: PrismaService) {}
   async create(data: CreateProduitDto): Promise<Produit> {
+    // Check if category exists
+    const categoryExists = await this.prisma.category.findUnique({
+      where: { id: data.categoryId },
+    });
+
+    if (!categoryExists) {
+      throw new BadRequestException(`Category #${data.categoryId} does not exist`);
+    }
+
     // Check if SKU already exists
     const existingSku = await this.prisma.inventory.findUnique({
       where: { sku: data.sku },
